@@ -12,32 +12,28 @@ public class Blackjack
 	private String summary;
 	private ArrayList<String> hand = new ArrayList<String>();
 
-	public Blackjack(String in) // For the House
-	{
-		money = 1000000; //House has one M
+	public Blackjack(String in) {// For the House
+		money = 1000000; //House has one Million
 		bet = 999999;
 		handTotal = 0;
 		summary = "empty";
 	}
 
-	public Blackjack()
-	{
+	public Blackjack() {
 		money = 100;
 		bet = 0;
 		handTotal = 0;
 		summary = "clear";
 	}
 
-	private void clear()
-	{
+	private void clear() {
 		bet = 0;
 		handTotal = 0;
 		hand.clear();
 		used.clear();
 	}
 
-	private void newCard() //WE NEED A NEW WAY OF SHUFFLING
-	{
+	private void newCard() { //WE NEED A NEW WAY OF SHUFFLING
 		int newCard = rand.nextInt(52), check = 1;
 		while(check == 1){
 			newCard = rand.nextInt(52);
@@ -65,8 +61,7 @@ public class Blackjack
 		}
 	}
 
-	private void betSystem(int playerNum)
-	{
+	private void betSystem(int playerNum) {
 		System.out.println();
 		System.out.println("Player " + playerNum + ": Your cash: " + money);
 		System.out.println("Player " + playerNum + ": Place a bet");
@@ -80,8 +75,10 @@ public class Blackjack
 		newCard();
 	}
 
-	private void hitSystem(int playerNum, Blackjack AI)
-	{
+	/*
+	 * Handles hits for current player
+	 */
+	private void hitSystem(int playerNum, Blackjack AI) {
 		System.out.println();
 		System.out.println("Dealer card: " + AI.hand.get(0));
 		System.out.print("Player " + playerNum + ": Your cards: ");
@@ -89,19 +86,16 @@ public class Blackjack
 		System.out.println("Player " + playerNum + ": Your card total: " + handTotal);
 		System.out.println("Player " + playerNum + ": Would you like to hit?");
 		char hit = scan.next().toLowerCase().charAt(0);
-		while(hit == 'y')
-		{
+		while(hit == 'y') {
 			newCard();
 			System.out.print("Player " + playerNum + ": Your cards: ");
 			displayCards();
 			System.out.println("Player " + playerNum + ": Your card total: " + handTotal);
-			if(handTotal <= 21)
-			{
+			if(handTotal <= 21) {
 				System.out.println("Player " + playerNum + ": Would you like to hit?");
 				hit = scan.next().toLowerCase().charAt(0);
 			}
-			else
-			{
+			else {
 				System.out.println("Player " + playerNum + ": You BUST, dealer wins!");
 				handTotal = 0;
 				hit = 'n';
@@ -111,42 +105,36 @@ public class Blackjack
 
 	private void winSystem(int playerNum, Blackjack AI)
 	{
-		if(handTotal == 0)
-		{
+		if(handTotal == 0) {
 			System.out.println("Player " + playerNum + ": You lose because you bust.");
 			money -= bet;
 			summary = "LOSE: Player Bust";
 		}
-		else if(AI.handTotal > 21)
-		{
+		else if(AI.handTotal > 21) {
 			System.out.println("Player " + playerNum + ": You win because dealer busts.");
 			money += bet;
 			summary = "WIN: Dealer Bust";
 		}
-		else if(AI.handTotal > handTotal)
-		{
+		else if(AI.handTotal > handTotal) {
 			System.out.println("Player " + playerNum + ": Your total: " + handTotal + " Dealer total: " + AI.handTotal);
 			System.out.println("Dealer wins!");
 			money -= bet;
 			summary = "LOSE: Player lost to dealer";
 		}
-		else if(AI.handTotal < handTotal)
-		{
+		else if(AI.handTotal < handTotal) {
 			System.out.println("Player " + playerNum + ": Your total: " + handTotal + " Dealer total: " + AI.handTotal);
 			System.out.println("You win!");
 			money += bet;
 			summary = "WIN: Player beat the dealer";
 		}
-		else if(AI.handTotal == handTotal)
-		{
+		else if(AI.handTotal == handTotal) {
 			System.out.println("Player 1: Your total: " + handTotal + " Dealer total: " + AI.handTotal);
 			System.out.println("Push.");
 			summary = "PUSH: Player tied the dealer";
 		}
 	}
 
-	private static int getCardValue(String card)
-	{
+	private static int getCardValue(String card) {
 		int num = 0;
 		switch(card){
 		case "0": num = 0; break;
@@ -168,8 +156,10 @@ public class Blackjack
 		return num;
 	}
 
-	private void displayCards()
-	{
+	/*
+	 * Displays cards for current player
+	 */
+	private void displayCards() {
 		for(String element: hand)
 		{
 			System.out.print(element + " ");
@@ -177,15 +167,14 @@ public class Blackjack
 		System.out.println();
 	}
 
-	public static void main(String[] args)
-	{
+	public static void main(String[] args) {
 		System.out.println("Welcome to the casino. This is the Blackjack table. Please play responsibly.");
 		System.out.println();
 		System.out.println("Would you like to customize your game?");
 		char custom = scan.next().toLowerCase().charAt(0);
 		boolean cardCount = false;
 		int deckSize = 4, runningCount = 0, trueCount = 0;
-		if(custom == 'y'){
+		if(custom == 'y') {
 			System.out.println("Would you like to enable automatic card counting:");
 			custom = scan.next().toLowerCase().charAt(0);
 			if(custom == 'y')
@@ -195,8 +184,7 @@ public class Blackjack
 		}
 		System.out.println("How many players will be playing today? Limit: 4 players.");
 		int numPlayers = scan.nextInt();
-		while(numPlayers < 1 || numPlayers > 4)
-		{
+		while(numPlayers < 1 || numPlayers > 4) {
 			System.out.println("Invalid number of players. Limit: 4 players.");
 			numPlayers = scan.nextInt();
 		}
@@ -207,16 +195,14 @@ public class Blackjack
 		Blackjack AI = new Blackjack("AI");
 		char play = 'y';
 		boolean cond = true; //Switched from false when following lines were still operating
-		switch(numPlayers)
-		{
+		switch(numPlayers) {
 		case 1: cond = p1.money > 0; break;
 		case 2: cond = p1.money > 0 || p2.money > 0; break;
 		case 3: cond = p1.money > 0 || p2.money > 0 || p3.money > 0; break;
 		case 4: cond = p1.money > 0 || p2.money > 0 || p3.money > 0 || p4.money > 0; break;
 		default: System.out.println("Fatal error on number of players."); break;
 		}
-		while(cond && play == 'y') //Game starts here
-		{
+		while(cond && play == 'y') {//Game starts here
 			p1.clear();
 			p2.clear();
 			p3.clear();
@@ -239,13 +225,6 @@ public class Blackjack
 				p3.betSystem(3);
 			if(numPlayers == 4 && p4.money > 0)
 				p4.betSystem(4);
-			
-			
-			/*Must display all cards to players before game
-			 * 
-			 * 
-			 * 
-			 */
 
 			//Perform Hits
 			if(numPlayers >= 1 && p1.money > 0)
@@ -261,8 +240,7 @@ public class Blackjack
 			System.out.print("Dealer reveals cards: ");
 			AI.displayCards();
 			System.out.println("Dealer card total: " + AI.handTotal);
-			while(AI.handTotal < 17 && AI.handTotal <= 21)
-			{
+			while(AI.handTotal < 17 && AI.handTotal <= 21) {
 				System.out.println();
 				System.out.println("Dealer hits.");
 				AI.newCard();
@@ -292,47 +270,42 @@ public class Blackjack
 			if(numPlayers == 4)
 				System.out.println("Player 4: " + p4.summary);
 			System.out.println();
-			if(numPlayers >= 1 && p1.money <= 0)
-			{
+			if(numPlayers >= 1 && p1.money <= 0) {
 				if(!p1.summary.equalsIgnoreCase("Inactive"))
 					System.out.println("Player 1 is broke and has to leave the casino.");
 				p1.summary = "Inactive";
 			}
-			if(numPlayers >= 2 && p2.money <= 0)
-			{
+			if(numPlayers >= 2 && p2.money <= 0) {
 				if(!p2.summary.equalsIgnoreCase("Inactive"))
 					System.out.println("Player 2 is broke and has to leave the casino.");
 				p2.summary = "Inactive";
 			}
-			if(numPlayers >= 3 && p3.money <= 0)
-			{
+			if(numPlayers >= 3 && p3.money <= 0) {
 				if(!p3.summary.equalsIgnoreCase("Inactive"))
 					System.out.println("Player 3 is broke and has to leave the casino.");
 				p3.summary = "Inactive";
 			}
-			if(numPlayers == 4 && p4.money <= 0)
-			{
+			if(numPlayers == 4 && p4.money <= 0) {
 				if(!p4.summary.equalsIgnoreCase("Inactive"))
 					System.out.println("Player 4 is broke and has to leave the casino.");
 				p4.summary = "Inactive";
 			}
 			System.out.println();
 
-			switch(numPlayers)
-			{
+			switch(numPlayers) {
 			case 1: cond = p1.money > 0; break;
 			case 2: cond = p1.money > 0 || p2.money > 0; break;
 			case 3: cond = p1.money > 0 || p2.money > 0 || p3.money > 0; break;
 			case 4: cond = p1.money > 0 || p2.money > 0 || p3.money > 0 || p4.money > 0; break;
 			default: System.out.println("Fatal error on number of players."); break;
 			}
-			if(cond)
-			{
+			if(cond) {
 				System.out.println("Play again?");
 				play = scan.next().toLowerCase().charAt(0);
 			}
-			else
+			else {
 				System.out.println("Ya'll broke.");
+			}
 		}
 	}
 }

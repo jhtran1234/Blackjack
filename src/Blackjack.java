@@ -46,14 +46,22 @@ public class Blackjack
 				p.newCard();
 			}
 
-			for(Player p : players) {
-				p.hit(AI);
+			if(AI.handTotal != 21) {
+				for(Player p : players) {
+					p.play(AI);
+				}
 			}
-
+			
 			System.out.println();
 			System.out.print("Dealer reveals cards: ");
 			AI.displayCards();
 			System.out.println("Dealer card total: " + AI.handTotal);
+			
+			if(AI.handTotal == 21) {
+				System.out.println("Dealer has a BlackJack!");
+				AI.blackJack = true;
+			}
+			
 			while(AI.handTotal < 17) {
 				System.out.println();
 				System.out.println("Dealer hits.");
@@ -65,6 +73,7 @@ public class Blackjack
 			if(AI.handTotal > 21) {
 				System.out.println("Dealer BUST, remaining players win!");
 			}
+			System.out.println();
 			
 			for(Player p : players) {
 				p.calculateOutcome(AI);

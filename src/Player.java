@@ -5,8 +5,11 @@ class Player {
 	int money, bet, handTotal;
 	String name, summary;
 	ArrayList<String> hand = new ArrayList<String>();
+	ArrayList<String> splitHand = new ArrayList<String>();
+	boolean blackJack = false, split = false, doubleDown = false;
+	
 	private static Scanner scan = new Scanner(System.in);
-
+	
 	public Player() {
 		money = 100;
 		bet = 0;
@@ -25,6 +28,10 @@ class Player {
 		bet = 0;
 		handTotal = 0;
 		hand.clear();
+		splitHand.clear();
+		blackJack = false;
+		split = false;
+		doubleDown = false;
 	}
 
 	void addName(String name) {
@@ -66,12 +73,29 @@ class Player {
 		}
 	}
 
-	void hit(Player AI) {
+	void play(Player AI) {
 		System.out.println();
 		System.out.println("Dealer card: " + AI.hand.get(0));
 		System.out.print(name + ": Your cards: ");
 		displayCards();
 		System.out.println(name + ": Your card total: " + handTotal);
+		
+		if(handTotal == 21) {
+			System.out.println(name + ": You have a BlackJack!");
+			blackJack = true;
+			return;
+		}
+		
+		//check if split available
+		
+		if(handTotal >= 9 && handTotal <= 11 && 2 * bet <= money) {
+			System.out.println(name + ": Would you like to double down?");
+			if(scan.next().toLowerCase().charAt(0) == 'y') {
+				doubleDown();
+				return;
+			}
+		}
+		
 		System.out.println(name + ": Would you like to hit?");
 		char hit = scan.next().toLowerCase().charAt(0);
 		while(hit == 'y') {
@@ -79,6 +103,7 @@ class Player {
 			System.out.print(name + ": Your cards: ");
 			displayCards();
 			System.out.println(name + ": Your card total: " + handTotal);
+			
 			if(handTotal <= 21) {
 				System.out.println(name + ": Would you like to hit?");
 				hit = scan.next().toLowerCase().charAt(0);
@@ -89,9 +114,38 @@ class Player {
 			}
 		}
 	}
+	
+	void doubleDown() {		
+		doubleDown = true;
+		bet *= 2;
+		newCard();
+		System.out.println(name + ": Doubled down. Bet has been doubled to " + bet + ".");
+	}
 
 	void calculateOutcome(Player AI){
-		if(handTotal > 21) {
+		if(doubleDown) {
+			System.out.print(name + ": Your cards are revealed: ");
+			displayCards();
+		}
+		
+		if(AI.blackJack) {
+			if(blackJack) {
+				System.out.println(name + ": You push because both you and dealer have a BlackJack.");
+				System.out.println("Push.");
+				summary = "PUSH: Player tied the dealer";
+			}
+			else {
+				System.out.println(name + ": You lose because dealer has a BlackJack.");
+				money -= bet;
+				summary = "LOSE: Dealer BlackJack";
+			}
+		}
+		else if(blackJack) {
+			System.out.println(name + ": You have a BlackJack!");
+			money += bet; //Pay 3 to 2
+			summary = "WIN: BlackJack";
+		}
+		else if(handTotal > 21) {
 			System.out.println(name + ": You lose because you bust.");
 			money -= bet;
 			summary = "LOSE: Player Bust";
@@ -120,6 +174,13 @@ class Player {
 		}
 	}
 
+	void displayCards() {
+		for(String card: hand){
+			System.out.print(card + " ");
+		}
+		System.out.println();
+	}
+	
 	private static int getCardValue(String card) {
 		int num = 0;
 		switch(card.charAt(0)){
@@ -138,12 +199,5 @@ class Player {
 		case 'K': num = 10; break;
 		}
 		return num;
-	}
-
-	void displayCards() {
-		for(String card: hand){
-			System.out.print(card + " ");
-		}
-		System.out.println();
 	}
 }

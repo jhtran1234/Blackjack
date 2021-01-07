@@ -4,49 +4,61 @@ import java.util.Stack;
 class Deck {
 	static ArrayList<String> cards = new ArrayList<>();
 	static Stack<String> shoe = new Stack<>();
+	private static Random rand = new Random();
 	static int numDecks = 6; //Number of decks in shoe
+	static int cutCard; //Sets when the dealer will shuffle
 	
-	static void clear() {
-		shoe.clear();
-		
+	static String deal() {
+		return shoe.pop();
+	}
+	
+	/*
+	 * @return true if dealer is shuffling shoe
+	 */
+	static boolean remainingShoe() {
+		if(shoe.size() <= cutCard) {
+			shuffle();
+			return true;
+		}
+		return false;
+	}
+	
+	static void setCutCard(int card) {
+		cutCard = card;
 	}
 	
 	static void setShoeSize(int size) {
 		numDecks = size;
+	}
+
+	static void shuffle() {
+		cards.clear();
+		shoe.clear();
 		
-		String currentCard = "";
-		for(int deck = 0; deck < numDecks; deck ++) {
-			for(int suite = 0; suite < 4; suite ++) {
-				for(int card = 1; card <= 13; card++) {
-					currentCard = "";
-					switch(suite) {
-					case 0: currentCard = "";
-					case 1: currentCard = "";
-					case 2: currentCard = "";
-					case 3: currentCard = "";
-					}
-					
-					switch(card) {
-					case 1: currentCard += "A";
-					case 2: currentCard += "A";
-					case 3: currentCard += "A";
-					case 4: currentCard += "A";
-					case 5: currentCard += "A";
-					case 6: currentCard += "A";
-					case 7: currentCard += "A";
-					case 8: currentCard += "A";
-					case 9: currentCard += "A";
-					case 10: currentCard += "A";
-					case 11: currentCard += "A";
-					case 12: currentCard += "A";
-					case 13: currentCard += "A";
-					}
+		for(int deck = 0; deck < numDecks * 4; deck ++) {
+			for(int card = 1; card <= 13; card++) {
+				switch(card) {
+				case 1: cards.add("A"); break;
+				case 2: cards.add("2"); break;
+				case 3: cards.add("3"); break;
+				case 4: cards.add("4"); break;
+				case 5: cards.add("5"); break;
+				case 6: cards.add("6"); break;
+				case 7: cards.add("7"); break;
+				case 8: cards.add("8"); break;
+				case 9: cards.add("9"); break;
+				case 10: cards.add("10"); break;
+				case 11: cards.add("J"); break;
+				case 12: cards.add("Q"); break;
+				case 13: cards.add("K"); break;
 				}
 			}
 		}
-	}
-	
-	static String deal() {
-		return shoe.pop();
+		
+		while(cards.size() > 0) {
+			shoe.push(cards.remove(rand.nextInt(cards.size())));
+		}
+		
+		cutCard = rand.nextInt(30) + 50 + 2 * numDecks;
 	}
 }

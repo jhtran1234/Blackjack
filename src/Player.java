@@ -5,8 +5,6 @@ class Player {
 	int money, bet, handTotal;
 	String name, summary;
 	ArrayList<String> hand = new ArrayList<String>();
-
-	private static Random rand = new Random();
 	private static Scanner scan = new Scanner(System.in);
 
 	public Player() {
@@ -33,37 +31,28 @@ class Player {
 		this.name = name;
 	}
 
-	void newCard() { //WE NEED A NEW WAY OF SHUFFLING to incorporate a 6 deck shoe
-		int newCard = rand.nextInt(52), check = 1;
-		while(check == 1){
-			newCard = rand.nextInt(52);
-			check = 0;
-			for(int element: used){
-				if(newCard == element)
-					check = 1; //Card generated has already been used
-			}
-		}
-		used.add(newCard);
-		hand.add(cards[newCard]);
+	void newCard() {
+		hand.add(Deck.deal());
 		handTotal = 0; //Recalculate total
 		int aceTotal = 0;
-		for(String element: hand)
-		{
-			handTotal += getCardValue(element);
-			if(element.equals("A"))
+		for(String card: hand) {
+			handTotal += getCardValue(card);
+			if(card.charAt(0) == 'A') {
 				aceTotal += 1;
+			}
 		}
-		while(aceTotal > 0)
-		{
-			if((handTotal + 10) <= 21)
+		
+		while(aceTotal > 0) { //Correctly calculates Aces in play
+			if((handTotal + 10) <= 21) {
 				handTotal += 10;
+			}
 			aceTotal --;
 		}
 	}
 
 	void bet() {
 		while(this.bet <= 0) {
-			System.out.println(name + ", please enter a bet.");
+			System.out.println(name + ", you have " + money + ". Please enter a bet.");
 			try {
 				this.bet = scan.nextInt();
 				while(bet > money || bet <= 0){
@@ -125,7 +114,7 @@ class Player {
 			summary = "WIN: Player beat the dealer";
 		}
 		else if(AI.handTotal == handTotal) {
-			System.out.println("Player 1: Your total: " + handTotal + " Dealer total: " + AI.handTotal);
+			System.out.println(name + ": Your total: " + handTotal + " Dealer total: " + AI.handTotal);
 			System.out.println("Push.");
 			summary = "PUSH: Player tied the dealer";
 		}
@@ -133,22 +122,20 @@ class Player {
 
 	private static int getCardValue(String card) {
 		int num = 0;
-		switch(card){
-		case "0": num = 0; break;
-		case "1": num = 1; break;
-		case "2": num = 2; break;
-		case "3": num = 3; break;
-		case "4": num = 4; break;
-		case "5": num = 5; break;
-		case "6": num = 6; break;
-		case "7": num = 7; break;
-		case "8": num = 8; break;
-		case "9": num = 9; break;
-		case "10": num = 10; break;
-		case "J": num = 10; break;
-		case "Q": num = 10; break;
-		case "K": num = 10; break;
-		case "A": num = 1; break;
+		switch(card.charAt(0)){
+		case 'A': num = 1; break;
+		case '2': num = 2; break;
+		case '3': num = 3; break;
+		case '4': num = 4; break;
+		case '5': num = 5; break;
+		case '6': num = 6; break;
+		case '7': num = 7; break;
+		case '8': num = 8; break;
+		case '9': num = 9; break;
+		case '1': num = 10; break;
+		case 'J': num = 10; break;
+		case 'Q': num = 10; break;
+		case 'K': num = 10; break;
 		}
 		return num;
 	}

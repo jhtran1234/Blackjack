@@ -1,59 +1,41 @@
 import java.util.ArrayList;
 import java.util.Scanner;
-import java.util.Random;
 public class Blackjack
 {
 	private static ArrayList<Player> players = new ArrayList<>();
 	private static Scanner scan = new Scanner(System.in);
-	
-	private static Player p1 = new Player();
-	private static Player p2 = new Player();
-	private static Player p3 = new Player();
-	private static Player p4 = new Player();
-	private static Player p5 = new Player();
-	private static Player p6 = new Player();
 	private static Player AI = new Player("AI");
 	
 	public static void main(String[] args) {
 		System.out.println("Welcome to the casino. This is the Blackjack table. Please play responsibly.");
 		System.out.println();
-		System.out.println("How many players will be playing today? Limit: 6 players.");
+		System.out.println("How many players will be playing today? Limit: 7 players.");
 		int numPlayers = scan.nextInt();
-		while(numPlayers < 1 || numPlayers > 6) {
-			System.out.println("Invalid number of players. Limit: 6 players.");
+		while(numPlayers < 1 || numPlayers > 7) {
+			System.out.println("Invalid number of players. Limit: 7 players.");
 			numPlayers = scan.nextInt();
 		}
 		
-		if(numPlayers >= 1) {
-			players.add(p1);
-		}
-		if(numPlayers >= 2) {
-			players.add(p2);
-		}
-		if(numPlayers >= 3) {
-			players.add(p3);
-		}
-		if(numPlayers >= 4) {
-			players.add(p4);
-		}
-		if(numPlayers >= 5) {
-			players.add(p5);
-		}
-		if(numPlayers == 6) {
-			players.add(p6);
+		for(int i = 1; i <= numPlayers; i ++) {
+			players.add(new Player());
 		}
 		
 		for(int i = 1; i <= players.size(); i ++) {
 			System.out.println("Player " + i + " please enter your name:");
-			players.get(i - 1).addName(scan.nextLine()); //might need buffer clear
+			players.get(i - 1).addName(scan.next()); //might need buffer clear
 		}
 		
 		char play = 'y';
+		Deck.shuffle();
 		while(players.size() > 0 && play == 'y') {
+			if(Deck.remainingShoe()) {
+				System.out.println("Dealer is shuffling shoe.");
+				//Reset card counting statistics here
+			}
+			
 			for(Player p : players) {
 				p.clear();
 			}
-			
 			AI.clear();
 			AI.newCard();
 			AI.newCard();
@@ -87,10 +69,9 @@ public class Blackjack
 			for(Player p : players) {
 				p.calculateOutcome(AI);
 			}
-			
 			System.out.println();
-			System.out.println("Game Summary:");
 			
+			System.out.println("Game Summary:");
 			for(Player p : players) {
 				System.out.println(p.name + ": " + p.summary);
 			}
@@ -114,7 +95,7 @@ public class Blackjack
 			}
 		}
 		for(Player p : players) {
-			/*Display final earnings*/
+			System.out.println(p.name + " is leaving with $" + p.money + ".");
 		}
 	}
 }

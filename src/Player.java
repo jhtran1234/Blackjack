@@ -1,15 +1,14 @@
 import java.util.ArrayList;
-import java.util.Random;
 import java.util.Scanner;
 class Player {
-	int money, bet, handTotal;
+	int money, bet, handTotal, splitHandTotal;
 	String name, summary;
 	ArrayList<String> hand = new ArrayList<String>();
 	ArrayList<String> splitHand = new ArrayList<String>();
-	boolean blackJack = false, split = false, doubleDown = false;
-	
+	boolean blackJack = false, split = false, doubleDown = false, cent = false;
+
 	private static Scanner scan = new Scanner(System.in);
-	
+
 	public Player() {
 		money = 100;
 		bet = 0;
@@ -18,7 +17,7 @@ class Player {
 	}
 
 	public Player(String AI) {
-		this.money = 1000000;
+		money = 1000000;
 		bet = 999999;
 		handTotal = 0;
 		summary = "empty";
@@ -27,6 +26,7 @@ class Player {
 	void clear() {
 		bet = 0;
 		handTotal = 0;
+		splitHandTotal = 0;
 		hand.clear();
 		splitHand.clear();
 		blackJack = false;
@@ -48,7 +48,7 @@ class Player {
 				aceTotal += 1;
 			}
 		}
-		
+
 		while(aceTotal > 0) { //Correctly calculates Aces in play
 			if((handTotal + 10) <= 21) {
 				handTotal += 10;
@@ -79,15 +79,22 @@ class Player {
 		System.out.print(name + ": Your cards: ");
 		displayCards();
 		System.out.println(name + ": Your card total: " + handTotal);
-		
+
 		if(handTotal == 21) {
 			System.out.println(name + ": You have a BlackJack!");
 			blackJack = true;
 			return;
 		}
-		
-		//check if split available
-		
+
+		if(hand.get(0).equalsIgnoreCase(hand.get(1)) && 2 * bet <= money) {
+			System.out.println(name + ": Would you like to spilt pairs?");
+			if(scan.next().toLowerCase().charAt(0) == 'y') {
+				splitPairs();
+				System.out.println(name + ": Your right hand card: " + hand.get(0));
+				System.out.println(name + ": Your card total: " + handTotal);		
+			}
+		}
+
 		if(handTotal >= 9 && handTotal <= 11 && 2 * bet <= money) {
 			System.out.println(name + ": Would you like to double down?");
 			if(scan.next().toLowerCase().charAt(0) == 'y') {
@@ -95,7 +102,7 @@ class Player {
 				return;
 			}
 		}
-		
+
 		System.out.println(name + ": Would you like to hit?");
 		char hit = scan.next().toLowerCase().charAt(0);
 		while(hit == 'y') {
@@ -103,8 +110,16 @@ class Player {
 			System.out.print(name + ": Your cards: ");
 			displayCards();
 			System.out.println(name + ": Your card total: " + handTotal);
-			
-			if(handTotal <= 21) {
+
+			if (split && hand.get(0).equalsIgnoreCase("A")) {
+				System.out.println("You may only hit once on a split Ace.");
+				hit = 'n';
+			}
+			else if(split && handTotal > 21) {
+				System.out.println(name + ": You BUST, dealer wins this hand!");
+				hit = 'n';
+			}
+			else if(handTotal <= 21) {
 				System.out.println(name + ": Would you like to hit?");
 				hit = scan.next().toLowerCase().charAt(0);
 			}
@@ -114,7 +129,61 @@ class Player {
 			}
 		}
 	}
-	
+
+	void splitPairs() {
+		split = true;
+		//bet *= 2;
+		splitHand.add(hand.remove(1));
+		handTotal /= 2;
+		splitHandTotal = handTotal;
+
+		System.out.println(name + ": Split pairs. An equal bet of " + bet + " has been placed for the split hand.");
+		System.out.println(name + ": Your left hand card: " + splitHand.get(0));
+		System.out.println(name + ": Your card total: " + splitHandTotal);
+		System.out.println(name + ": Would you like to hit?");
+		char hit = scan.next().toLowerCase().charAt(0);
+		while(hit == 'y') {
+			splitHand.add(Deck.deal());
+			splitHandTotal = 0; //Recalculate total
+
+			int aceTotal = 0;
+			for(String card: splitHand) {
+				splitHandTotal += getCardValue(card);
+				if(card.charAt(0) == 'A') {
+					aceTotal += 1;
+				}
+			}
+
+			while(aceTotal > 0) { //Correctly calculates Aces in play
+				if((splitHandTotal + 10) <= 21) {
+					splitHandTotal += 10;
+				}
+				aceTotal --;
+			}
+
+			System.out.print(name + ": Your cards: ");
+			for(String card: splitHand){
+				System.out.print(card + " ");
+			}
+			System.out.println();
+			System.out.println(name + ": Your card total: " + splitHandTotal);
+
+			if (splitHand.get(0).equalsIgnoreCase("A")) {
+				System.out.println("You may only hit once on a split Ace.");
+				hit = 'n';
+			}
+			else if(splitHandTotal <= 21) {
+				System.out.println(name + ": Would you like to hit?");
+				hit = scan.next().toLowerCase().charAt(0);
+			}
+			else {
+				System.out.println(name + ": You BUST, dealer wins this hand!");
+				hit = 'n';
+			}
+		}
+		System.out.println();
+	}
+
 	void doubleDown() {		
 		doubleDown = true;
 		bet *= 2;
@@ -123,11 +192,14 @@ class Player {
 	}
 
 	void calculateOutcome(Player AI){
-		if(doubleDown) {
+		if(split) {
+			//Code outcomes. Be mindful of 21s that are not BlackJacks
+		}
+		else if(doubleDown) {
 			System.out.print(name + ": Your cards are revealed: ");
 			displayCards();
 		}
-		
+
 		if(AI.blackJack) {
 			if(blackJack) {
 				System.out.println(name + ": You push because both you and dealer have a BlackJack.");
@@ -142,7 +214,13 @@ class Player {
 		}
 		else if(blackJack) {
 			System.out.println(name + ": You have a BlackJack!");
-			money += bet; //Pay 3 to 2
+			money += 1.5 * bet; //Pay 3 to 2
+			if(bet % 2 == 1) {
+				cent = !cent;
+				if(!cent) {
+					money++;
+				}
+			}
 			summary = "WIN: BlackJack";
 		}
 		else if(handTotal > 21) {
@@ -180,7 +258,7 @@ class Player {
 		}
 		System.out.println();
 	}
-	
+
 	private static int getCardValue(String card) {
 		int num = 0;
 		switch(card.charAt(0)){

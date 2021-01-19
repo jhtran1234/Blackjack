@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Scanner;
 public class Blackjack {
 	private static ArrayList<Player> players = new ArrayList<>();
@@ -59,6 +60,11 @@ public class Blackjack {
 			System.out.println("Dealer card total: " + AI.handTotal);
 			
 			if(AI.handTotal == 21) {
+				for(Player p : players) {
+					System.out.print(p.name + ": Your cards: ");
+					p.displayCards();
+				}
+				
 				System.out.println("Dealer has a BlackJack!");
 				AI.blackJack = true;
 			}
@@ -87,13 +93,15 @@ public class Blackjack {
 			}
 			System.out.println();
 			
-			for(Player p : players) {
-				if(p.money <= 0){
+			for (Iterator<Player> iterator = players.iterator(); iterator.hasNext();) {
+				Player p = iterator.next();
+			    if(p.money <= 0) {
 					System.out.println(p.name + " is broke and has to leave the casino.");
 					p.summary = "Inactive";
-					players.remove(p);
-				}
+			        iterator.remove();
+			    }
 			}
+			
 			System.out.println();
 			
 			if(players.size() > 0) {

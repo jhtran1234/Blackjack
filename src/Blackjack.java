@@ -1,13 +1,15 @@
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Scanner;
-public class Blackjack
-{
+public class Blackjack {
 	private static ArrayList<Player> players = new ArrayList<>();
 	private static Scanner scan = new Scanner(System.in);
 	private static Player AI = new Player("AI");
 	
 	public static void main(String[] args) {
 		System.out.println("Welcome to the casino. This is the Blackjack table. Please play responsibly.");
+		System.out.println("BlackJack pays 3 to 2.");
+		System.out.println("Dealer stands on soft 17.");
 		System.out.println();
 		System.out.println("How many players will be playing today? Limit: 7 players.");
 		int numPlayers = scan.nextInt();
@@ -58,6 +60,11 @@ public class Blackjack
 			System.out.println("Dealer card total: " + AI.handTotal);
 			
 			if(AI.handTotal == 21) {
+				for(Player p : players) {
+					System.out.print(p.name + ": Your cards: ");
+					p.displayCards();
+				}
+				
 				System.out.println("Dealer has a BlackJack!");
 				AI.blackJack = true;
 			}
@@ -86,13 +93,15 @@ public class Blackjack
 			}
 			System.out.println();
 			
-			for(Player p : players) {
-				if(p.money <= 0){
+			for (Iterator<Player> iterator = players.iterator(); iterator.hasNext();) {
+				Player p = iterator.next();
+			    if(p.money <= 0) {
 					System.out.println(p.name + " is broke and has to leave the casino.");
 					p.summary = "Inactive";
-					players.remove(p);
-				}
+			        iterator.remove();
+			    }
 			}
+			
 			System.out.println();
 			
 			if(players.size() > 0) {
@@ -103,6 +112,7 @@ public class Blackjack
 				System.out.println("Ya'll broke.");
 			}
 		}
+		
 		for(Player p : players) {
 			System.out.println(p.name + " is leaving with $" + p.money + ".");
 		}

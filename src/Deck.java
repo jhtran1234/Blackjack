@@ -7,9 +7,22 @@ class Deck {
 	private static Random rand = new Random();
 	static int numDecks = 6; //Number of decks in shoe
 	static int cutCard; //Sets when the dealer will shuffle
+	static int high = 0, low = 0, neutral = 0; //Used for card counting stats
 	
 	static String deal() {
-		return shoe.pop();
+		String card = shoe.pop();
+		int val = Player.getCardValue(card);
+		if(val <= 6 && val != 1){
+			low ++;
+		}
+		else if (val >= 10 || val == 1) {
+			high ++;
+		}
+		else {
+			neutral ++;
+		}
+		
+		return card;
 	}
 	
 	/*
@@ -23,6 +36,10 @@ class Deck {
 		return false;
 	}
 	
+	static void setNumDecks(int decks) {
+		numDecks = decks;
+	}
+	
 	static void setCutCard(int card) {
 		cutCard = card;
 	}
@@ -34,6 +51,8 @@ class Deck {
 	static void shuffle() {
 		cards.clear();
 		shoe.clear();
+		high = 0;
+		low = 0;
 		
 		for(int deck = 0; deck < numDecks * 4; deck ++) {
 			for(int card = 1; card <= 13; card++) {
@@ -55,6 +74,7 @@ class Deck {
 			}
 		}
 		
+		//Adds and shuffles all cards to shoe
 		while(cards.size() > 0) {
 			shoe.push(cards.remove(rand.nextInt(cards.size())));
 		}

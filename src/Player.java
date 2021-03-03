@@ -15,6 +15,13 @@ class Player {
 		handTotal = 0;
 		summary = "clear";
 	}
+	
+	public Player(int money) {
+		this.money = money;
+		bet = 0;
+		handTotal = 0;
+		summary = "clear";
+	}
 
 	public Player(String AI) {
 		money = 1000000;
@@ -326,7 +333,7 @@ class Player {
 		System.out.println();
 	}
 
-	private static int getCardValue(String card) {
+	static int getCardValue(String card) {
 		int num = 0;
 		switch(card.charAt(0)){
 		case 'A': num = 1; break;

@@ -7,10 +7,26 @@ public class Blackjack {
 	private static Player AI = new Player("AI");
 	
 	public static void main(String[] args) {
+		boolean cardCount = false;
+		int money = 100;
+		
 		System.out.println("Welcome to the casino. This is the Blackjack table. Please play responsibly.");
 		System.out.println("BlackJack pays 3 to 2.");
 		System.out.println("Dealer stands on soft 17.");
 		System.out.println();
+		System.out.println("Would you like to customize your gameplay?");
+		char customize = scan.next().toLowerCase().charAt(0);
+		if(customize == 'y') {
+			System.out.println("Would you like to enable card counting assistance?");
+			customize = scan.next().toLowerCase().charAt(0);
+			if(customize == 'y') {
+				cardCount = true;
+			}
+			System.out.println("How much money should each player start with? (Default: 100)");
+			money = scan.nextInt();
+			System.out.println("How much decks should be in the shoe? (Default: 6)");
+			Deck.setNumDecks(scan.nextInt());
+		}
 		System.out.println("How many players will be playing today? Limit: 7 players.");
 		int numPlayers = scan.nextInt();
 		while(numPlayers < 1 || numPlayers > 7) {
@@ -19,7 +35,7 @@ public class Blackjack {
 		}
 		
 		for(int i = 1; i <= numPlayers; i ++) {
-			players.add(new Player());
+			players.add(new Player(money));
 		}
 		
 		for(int i = 1; i <= players.size(); i ++) {
@@ -32,16 +48,25 @@ public class Blackjack {
 		while(players.size() > 0 && play == 'y') {
 			if(Deck.remainingShoe()) {
 				System.out.println("Dealer is shuffling shoe.");
-				//Reset card counting statistics here
 			}
 			
 			for(Player p : players) {
 				p.clear();
 			}
 			AI.clear();
-			AI.newCard();
-			AI.newCard();
 
+			if(cardCount) {
+				System.out.println("High: " + Deck.high);
+				System.out.println("Low: " + Deck.low);
+				System.out.println("Count: " + (Deck.low - Deck.high));
+				double trueCount = ((double) (Deck.low - Deck.high) * 52) / ((double) (Deck.numDecks * 52 - Deck.low + Deck.neutral + Deck.high));
+				System.out.println("True Count: " + String.format("%.1f", trueCount));
+				System.out.println();
+			}
+			
+			AI.newCard();
+			AI.newCard();
+			
 			for(Player p : players) {
 				p.bet();
 				p.newCard();
